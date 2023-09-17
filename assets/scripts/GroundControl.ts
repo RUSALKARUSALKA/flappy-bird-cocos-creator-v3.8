@@ -1,4 +1,5 @@
 import { _decorator, Component, Node, Sprite, UITransform, v3 } from 'cc';
+import { Global } from './Global';
 const { ccclass, property } = _decorator;
 
 @ccclass('GroundControl')
@@ -13,8 +14,11 @@ export class GroundControl extends Component {
     }
 
     update(deltaTime: number) {
-        this.g1.setPosition(v3(this.g1.position.x - 3, 0, 0));
-        this.g2.setPosition(v3(this.g2.position.x - 3, 0, 0));
+        if (!Global.gameStarted) {
+            return;
+        }
+        this.g1.setPosition(v3(this.g1.position.x - 0.5, 0, 0));
+        this.g2.setPosition(v3(this.g2.position.x - 0.5, 0, 0));
         
         let w = this.g1.getComponent(UITransform).contentSize.width;
 
