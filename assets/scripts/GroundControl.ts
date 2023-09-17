@@ -17,8 +17,8 @@ export class GroundControl extends Component {
         if (!Global.gameStarted) {
             return;
         }
-        this.g1.setPosition(v3(this.g1.position.x - 0.5, 0, 0));
-        this.g2.setPosition(v3(this.g2.position.x - 0.5, 0, 0));
+        this.g1.setPosition(v3(this.g1.position.x - 2, 0, 0));
+        this.g2.setPosition(v3(this.g2.position.x - 2, 0, 0));
         
         let w = this.g1.getComponent(UITransform).contentSize.width;
 

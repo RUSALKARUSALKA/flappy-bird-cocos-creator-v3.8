@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, instantiate, v3 } from 'cc';
+import { _decorator, Component, Node, CCFloat, instantiate, v3 } from 'cc';
 import { Global } from './Global';
 const { ccclass, property } = _decorator;
 
@@ -7,7 +7,7 @@ export class PipeControl extends Component {
     private pipeUp: Node = null;
     private pipeDown: Node = null;
 
-    @property(Number)
+    @property(CCFloat)
     pipeMoveSpeed: number = -1;
 
     start() {

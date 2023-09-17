@@ -108,7 +108,7 @@
     "_lpos": {
       "__type__": "cc.Vec3",
       "x": 144,
-      "y": 256,
+      "y": 640,
       "z": 0
     },
     "_lrot": {
@@ -193,7 +193,7 @@
     "_priority": 0,
     "_fov": 45,
     "_fovAxis": 0,
-    "_orthoHeight": 256,
+    "_orthoHeight": 640,
     "_near": 0,
     "_far": 1000,
     "_color": {
@@ -986,7 +986,7 @@
     },
     "_enabled": true,
     "__prefab": null,
-    "jumpForce": 5,
+    "jumpForce": 6,
     "turnAngle": 45,
     "_id": "301JkMLcBKz6K/yZzWrM0V"
   },
@@ -1396,7 +1396,7 @@
     "_string": "重新开始",
     "_horizontalAlign": 1,
     "_verticalAlign": 1,
-    "_actualFontSize": 21.40625,
+    "_actualFontSize": 20,
     "_fontSize": 20,
     "_fontFamily": "Arial",
     "_lineHeight": 40,
@@ -1819,7 +1819,7 @@
     "_contentSize": {
       "__type__": "cc.Size",
       "width": 288,
-      "height": 512
+      "height": 1280
     },
     "_anchorPoint": {
       "__type__": "cc.Vec2",

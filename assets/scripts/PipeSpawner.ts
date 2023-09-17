@@ -1,4 +1,4 @@
-import { _decorator, Component, Node, Prefab, instantiate, v3, UITransform } from 'cc';
+import { _decorator, Component, Node, Prefab, instantiate, v3, UITransform, CCInteger } from 'cc';
 const { ccclass, property } = _decorator;
 import { Global } from './Global';
 
@@ -8,7 +8,7 @@ export class PipeSpawner extends Component {
     @property(Prefab)
     pipePrefab: Prefab = null;
 
-    @property(Number)
+    @property(CCInteger)
     maxPipeSpace: number = 200;
 
     private spawned: boolean = false;
