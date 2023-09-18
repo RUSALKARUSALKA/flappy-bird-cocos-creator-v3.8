@@ -19,7 +19,7 @@ export class BirdControl extends Component {
         let collider = this.getComponent(Collider2D);
         collider.on(Contact2DType.BEGIN_CONTACT, this.onContact, this);
         // 注册交互事件，只有注册了之后触发才起作用
-        // input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
+        input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
         input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
         this.getComponent(RigidBody2D).sleep();
     }
@@ -32,6 +32,11 @@ export class BirdControl extends Component {
     }
 
     onTouchStart(event: EventTouch) {
+        if (Global.gameLost) {
+            return;
+        }
+        this.startGame();
+        this.jump();
     }
 
     onKeyDown(event: KeyboardEvent) {

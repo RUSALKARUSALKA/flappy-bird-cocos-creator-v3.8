@@ -3,6 +3,7 @@ const { ccclass, property } = _decorator;
 
 @ccclass('AudioEngine')
 export class AudioEngine extends Component {
+    // 注意，音频文件在苹果手机上似乎无法加载.ogg格式，否则在加载过程中控制台会报 failed to load Web Audio null 错误。.wav格式可以正常加载。
     @property(AudioClip)
     wing: AudioClip = null;
 
