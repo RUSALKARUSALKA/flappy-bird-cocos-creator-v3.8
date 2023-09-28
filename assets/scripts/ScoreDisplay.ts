@@ -1,5 +1,7 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite, Vec3} from 'cc';
+import { _decorator, Component, Node, SpriteFrame, Sprite, Vec3, native, sys} from 'cc';
 import { Global } from './Global';
+import { webManager } from './WebManager';
+
 const { ccclass, property } = _decorator;
 
 @ccclass('ScoreDisplay')
@@ -31,7 +33,6 @@ export class ScoreDisplay extends Component {
         const w = this.scoreSpriteFrames[0].originalSize.width;
         const currentScoreDigitNum = Global.score.toString().length;
         let totalScoreWidth = currentScoreDigitNum * w;
-        console.log(currentScoreDigitNum / 2);
         let beginX = -Math.floor(currentScoreDigitNum / 2) * w;
         if (totalScoreWidth % 2 == 1) {
             beginX -= Math.floor(w / 2);
@@ -41,6 +42,12 @@ export class ScoreDisplay extends Component {
             digitNode.getComponent(Sprite).spriteFrame = this.scoreSpriteFrames[parseInt(value)];
             digitNode.setPosition(new Vec3(beginX + index * w + Math.floor(w / 2), 0, 0));
         });
+        // 向服务器发送当前分数
+        // this.sendWebSocketData(Global.score.toString());
     }
+
+
+
+
 }
 

@@ -2,6 +2,8 @@ import { _decorator, Component, tween, Animation, Node, Input, Vec3, Color, inpu
 import { AudioEngine } from './AudioEngine';
 import {Global} from './Global';
 import { ScoreDisplay } from './ScoreDisplay';
+import { webManager } from './WebManager';
+import { GameStartCounter } from './GameStartCounter';
 const { ccclass, property } = _decorator;
 
 @ccclass('BirdControl')
@@ -48,12 +50,17 @@ export class BirdControl extends Component {
         }
         this.startGame();
         this.jump();
+        webManager.sendWebSocketData("jump");
     }
 
     startGame() {
         if (Global.gameStarted) {
             return;
         }
+        // 游戏开始倒计时
+        find("Canvas/GameStartCountdown").getComponent(GameStartCounter).startCountdown();
+        console.log("咋就开始了呢")
+
         Global.gameStarted = true;
         this.getComponent(Animation).play();
         let title = find("Canvas/Title");
@@ -106,7 +113,6 @@ export class BirdControl extends Component {
     }
 
     onContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null) {
-        console.log(`hit ${otherCollider.tag}`);
         if (Global.gameLost) {
             return;
         }

@@ -563,7 +563,7 @@
     "__prefab": {
       "__id__": 27
     },
-    "pipeMoveSpeed": -2,
+    "pipeMoveSpeed": 0,
     "_id": ""
   },
   {
