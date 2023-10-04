@@ -5,9 +5,10 @@ const { ccclass, property } = _decorator;
 @ccclass('WebManager')
 export class WebManager extends Component {
     private socket: WebSocket = null;
-    private serverURL: string = "ws://192.168.2.2:30001/";
+    private serverURL: string = "ws://192.168.8.2:8000/";
 
     start() {
+        this.initWebSocketConnection();
     }
 
     update(deltaTime: number) {
@@ -33,6 +34,7 @@ export class WebManager extends Component {
             }
             else if (event.data.toString().indexOf("jump") != -1) {
                 console.log("收到跳跃指令");
+                console.log(find("Canvas/Ground"));
                 find("Canvas/Bird").getComponent(BirdControl).jump();
                 // this.node.emit("jump");
             }
@@ -55,6 +57,9 @@ export class WebManager extends Component {
         if (this.socket && this.socket.readyState === WebSocket.OPEN) {
             this.socket.send(data);
         }
+        else {
+            console.warn('WebSocket is not open: failed to send data', data);
+        }
     }
 
     // 关闭 WebSocket 连接
@@ -65,6 +70,5 @@ export class WebManager extends Component {
     }
 }
 
-console.log("WebManager.ts");
-export let webManager = new WebManager();
-webManager.initWebSocketConnection();
+// export let webManager = new WebManager();
+// webManager.initWebSocketConnection();

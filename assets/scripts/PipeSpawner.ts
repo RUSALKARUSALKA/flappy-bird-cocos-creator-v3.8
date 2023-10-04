@@ -1,6 +1,6 @@
 import { _decorator, Component, Node, Prefab, instantiate, v3, UITransform, CCInteger } from 'cc';
 const { ccclass, property } = _decorator;
-import { Global } from './Global';
+import { GameManager } from './GameManager';
 
 @ccclass('PipeSpawner')
 export class PipeSpawner extends Component {
@@ -20,7 +20,7 @@ export class PipeSpawner extends Component {
     }
 
     update(deltaTime: number) {
-        if (!Global.gameStarted) {
+        if (!GameManager.gameStarted) {
             return;
         }
         if (!this.spawned) {

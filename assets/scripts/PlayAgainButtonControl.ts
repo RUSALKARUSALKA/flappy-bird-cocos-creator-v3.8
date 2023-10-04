@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, find } from 'cc';
-import { Global } from './Global';
+import { GameManager } from './GameManager';
 import { BirdControl } from './BirdControl';
 const { ccclass, property } = _decorator;
 

@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, Sprite, UITransform, v3 } from 'cc';
-import { Global } from './Global';
+import { GameManager } from './GameManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('GroundControl')
@@ -14,7 +14,7 @@ export class GroundControl extends Component {
     }
 
     update(deltaTime: number) {
-        if (!Global.gameStarted) {
+        if (!GameManager.gameStarted) {
             return;
         }
         this.g1.setPosition(v3(this.g1.position.x - 2, 0, 0));

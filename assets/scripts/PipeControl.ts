@@ -1,5 +1,5 @@
 import { _decorator, Component, Node, CCFloat, instantiate, v3 } from 'cc';
-import { Global } from './Global';
+import { GameManager } from './GameManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('PipeControl')
@@ -16,7 +16,7 @@ export class PipeControl extends Component {
     }
 
     update(deltaTime: number) {
-        if (!Global.gameStarted) {
+        if (!GameManager.gameStarted) {
             return;
         }
         this.pipeUp.setPosition(this.pipeUp.getPosition().add(v3(this.pipeMoveSpeed, 0, 0)));

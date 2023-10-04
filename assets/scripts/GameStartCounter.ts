@@ -1,4 +1,5 @@
-import { _decorator, Component, Node, SpriteFrame, Sprite, Vec3, native, sys} from 'cc';
+import { _decorator, find, Component, Node, SpriteFrame, Sprite, Vec3, native, sys} from 'cc';
+import { GameManager } from './GameManager';
 
 const { ccclass, property } = _decorator;
 
@@ -15,30 +16,27 @@ export class GameStartCounter extends Component {
         
     }
 
-    startCountdown() {
-        function sleep(ms) {
-            console.log("进入sleep");
-            let ff = (tt => {
-                console.log("进入ff");
-                return setTimeout(tt, ms)});
-            return new Promise(ff);
+    startCountdown(f) {
+        if (GameManager.countdownStart || GameManager.gameStarted) {
+            return;
         }
-
-        async function setScoreSpriteFrame(spriteFrame, duration) {
-            console.log("进入这个弔函数")
-            this.getComponent(Sprite).spriteFrame = spriteFrame;
-            await sleep(duration);
-        }
-
-        async function startGame() {
-            setScoreSpriteFrame.call(this, this.scoreSpriteFrames[3], 1000);
-            setScoreSpriteFrame.call(this, this.scoreSpriteFrames[2], 1000);
-            setScoreSpriteFrame.call(this, this.scoreSpriteFrames[1], 1000);
-            console.log("游戏开始");
-            this.getComponent(Sprite).spriteFrame = null;
-        }
-        console.log(startGame.bind(this)());
-        console.log("游戏开始倒计时");
+        find("Canvas/GameStartCountdown").getComponent(Sprite).spriteFrame = this.scoreSpriteFrames[3];
+        GameManager.countdownStart = true;
+        const t = (sec) => new Promise(
+            (r) => {
+                setTimeout(() => {
+                    find("Canvas/GameStartCountdown").getComponent(Sprite).spriteFrame = this.scoreSpriteFrames[sec];
+                    if (sec == 0) {
+                        find("Canvas/GameStartCountdown").getComponent(Sprite).spriteFrame = null;
+                        GameManager.countdownOver = true;
+                        GameManager.countdownStart = false;
+                        f();
+                    }
+                    r(888);
+                }, 1000);
+            }
+        );
+        t(2).then((r) => t(1)).then((r) => t(0)).catch((e) => console.log(e));
     }
 }
 

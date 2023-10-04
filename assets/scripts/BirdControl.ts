@@ -1,9 +1,8 @@
 import { _decorator, Component, tween, Animation, Node, Input, Vec3, Color, input, EventTouch , EventMouse, RigidBody2D, v2, Collider2D, Contact2DType, IPhysics2DContact, find, Sprite, CCInteger} from 'cc';
 import { AudioEngine } from './AudioEngine';
-import {Global} from './Global';
+import {GameManager} from './GameManager';
 import { ScoreDisplay } from './ScoreDisplay';
-import { webManager } from './WebManager';
-import { GameStartCounter } from './GameStartCounter';
+import { WebManager } from './WebManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('BirdControl')
@@ -15,96 +14,20 @@ export class BirdControl extends Component {
     turnAngle: number = 45;
 
     private _rigidBody: RigidBody2D = null;
+    private _uuid: string = null;
 
     start() {
         this._rigidBody = this.getComponent(RigidBody2D);
         let collider = this.getComponent(Collider2D);
         collider.on(Contact2DType.BEGIN_CONTACT, this.onContact, this);
-        // 注册交互事件，只有注册了之后触发才起作用
-        input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
-        input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
         this.getComponent(RigidBody2D).sleep();
     }
 
     update(deltaTime: number) {
-        if (!Global.gameStarted) return;
+        if (!GameManager.gameStarted) return;
         var velocityY = this._rigidBody.linearVelocity.y;
         var angleRate = Math.min(Math.max(velocityY, -this.jumpForce), this.jumpForce) / this.jumpForce;
         this.node.angle = -(angleRate) * -this.turnAngle;
-    }
-
-    onTouchStart(event: EventTouch) {
-        if (Global.gameLost) {
-            return;
-        }
-        this.startGame();
-        this.jump();
-    }
-
-    onKeyDown(event: KeyboardEvent) {
-    }
-
-    onMouseDown(event: EventMouse){
-        if (Global.gameLost) {
-            return;
-        }
-        this.startGame();
-        this.jump();
-        webManager.sendWebSocketData("jump");
-    }
-
-    startGame() {
-        if (Global.gameStarted) {
-            return;
-        }
-        // 游戏开始倒计时
-        find("Canvas/GameStartCountdown").getComponent(GameStartCounter).startCountdown();
-        console.log("咋就开始了呢")
-
-        Global.gameStarted = true;
-        this.getComponent(Animation).play();
-        let title = find("Canvas/Title");
-        let gameOverLabel = find("Canvas/GameOver");
-        find("Canvas/Score").getComponent(ScoreDisplay).refreshScoreDisplay();
-        if (Global.gameLost)
-        {
-            this.tweenDisappear(gameOverLabel, 0.2);
-        }
-        else
-        {
-            this.tweenDisappear(title, 0.5);
-        }
-        Global.gameLost = false;
-        find("Canvas/GameOver/btn_PlayAgain").setPosition(new Vec3(0, -10000, 0));
-
-        this.node.setPosition(new Vec3(0,0,0));
-        // 手动设置位置之后需要重新唤醒刚体，否则在触发碰撞等物理事件之前刚体属性不起作用
-        this.getComponent(RigidBody2D).wakeUp();
-    }
-
-    gameOver() {
-        Global.gameStarted = false;
-        Global.gameLost = true;
-        let gameOverLabel = find("Canvas/GameOver");
-        this.getComponent(AudioEngine).play("die");
-        this.getComponent(Animation).stop();
-        gameOverLabel.setPosition(new Vec3(0, 50, 0));
-        // this.tweenDisappear(gameOverLabel, 0.5, true);
-        gameOverLabel.getComponent(Sprite).color = new Color(255, 255, 255, 255);
-        gameOverLabel.getChildByName("btn_PlayAgain").setPosition(new Vec3(0, 50, 0));
-    }
-
-    tweenDisappear(node: Node, duraion: number, div: boolean = false) {
-        // ! v3.8有bug，不能用tween改变color
-        // tween(find("Canvas/Title").getComponent(Sprite).color).to(1, new Color(0, 0, 0, 0)).start();
-        tween(node).to(duraion, {}, {onUpdate: (target, ratio) => {
-            // 透明度渐变由于上边说的那个bug的存在，只能放到update里手动实现
-            let c = node.getComponent(Sprite).color;
-            // 这个ratio表示缓动的当前进度，从0到1
-            ratio = div ? ratio : 1 - ratio;
-            c = new Color(c.r, c.g, c.b, 255 * ratio);
-            node.getComponent(Sprite).color = c;
-        }}).start(); 
     }
 
     jump() {
@@ -113,7 +36,7 @@ export class BirdControl extends Component {
     }
 
     onContact(selfCollider: Collider2D, otherCollider: Collider2D, contact: IPhysics2DContact | null) {
-        if (Global.gameLost) {
+        if (GameManager.gameLost) {
             return;
         }
         switch (otherCollider.tag) {
@@ -121,12 +44,12 @@ export class BirdControl extends Component {
             case 1:
             case 3:
                 this.getComponent(AudioEngine).play("hit");
-                Global.score = 0;
+                GameManager.score = 0;
                 this.gameOver();
                 break;
             case 2:
                 this.getComponent(AudioEngine).play("score");
-                Global.score++;
+                GameManager.score++;
                 find("Canvas/Score").getComponent(ScoreDisplay).refreshScoreDisplay();
                 break;
             default:
