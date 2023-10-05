@@ -1,5 +1,6 @@
 import { _decorator, Component, find, Node } from 'cc';
 import { BirdControl } from './BirdControl';
+import { GameManager } from './GameManager';
 const { ccclass, property } = _decorator;
 
 @ccclass('WebManager')
@@ -23,6 +24,8 @@ export class WebManager extends Component {
             console.log('WebSocket connected!');
             // 可以在此处发送初始数据到服务器
             this.sendWebSocketData("login");
+            // 查询当前已经在房间中的小鸟，为它们创建实例
+            this.sendWebSocketData("query_current_players");
         };
 
         this.socket.onmessage = (event) => {
@@ -31,12 +34,33 @@ export class WebManager extends Component {
                 console.log("登录成功");
                 const webUuid = event.data.toString().split(" ").pop();
                 console.log("uuid:", webUuid);
+                // 登录成功，创建一个小鸟
+                // 在Canvas中添加一个小鸟node
+                find("Canvas/GameManager").getComponent(GameManager).initMyBird(webUuid);
+                console.log("创建我的小鸟成功");
             }
             else if (event.data.toString().indexOf("jump") != -1) {
                 console.log("收到跳跃指令");
                 console.log(find("Canvas/Ground"));
                 find("Canvas/Bird").getComponent(BirdControl).jump();
                 // this.node.emit("jump");
+            }
+            else if (event.data.toString().indexOf("query_current_players") != -1) {
+                console.log("查询当前玩家");
+                // 查询当前已经在房间中的小鸟，为它们创建实例
+                const players = event.data.toString().split(" ").pop().split(",");
+                console.log("当前房间中已有的玩家：", players);
+                for (let i = 0; i < players.length; i++) {
+                    if (players[i] != "") {
+                        find("Canvas/GameManager").getComponent(GameManager).initOtherBird(players[i]);
+                    }
+                }
+            }
+            else if (event.data.toString().indexOf("welcome") != -1) {
+                console.log("有新玩家加入");
+                const newPlayer = event.data.toString().split(" ").pop();
+                console.log("newPlayer:", newPlayer);
+                find("Canvas/GameManager").getComponent(GameManager).initOtherBird(newPlayer);
             }
         };
 

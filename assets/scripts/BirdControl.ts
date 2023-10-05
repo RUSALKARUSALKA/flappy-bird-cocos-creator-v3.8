@@ -14,7 +14,7 @@ export class BirdControl extends Component {
     turnAngle: number = 45;
 
     private _rigidBody: RigidBody2D = null;
-    private _uuid: string = null;
+    public _uuid: string = null;
 
     start() {
         this._rigidBody = this.getComponent(RigidBody2D);
@@ -40,12 +40,12 @@ export class BirdControl extends Component {
             return;
         }
         switch (otherCollider.tag) {
-            case 0:
+            // case 0: // 忽略鸟和鸟的碰撞
             case 1:
             case 3:
                 this.getComponent(AudioEngine).play("hit");
                 GameManager.score = 0;
-                this.gameOver();
+                // this.gameOver();
                 break;
             case 2:
                 this.getComponent(AudioEngine).play("score");

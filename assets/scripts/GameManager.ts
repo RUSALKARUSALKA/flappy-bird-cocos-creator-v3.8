@@ -1,8 +1,9 @@
-import { _decorator, Component, tween, Animation, Node, Input, Vec3, Color, input, EventTouch , EventMouse, RigidBody2D, v2, Collider2D, Contact2DType, IPhysics2DContact, find, Sprite, CCInteger} from 'cc';
+import { _decorator, Component, tween, instantiate, Animation, Node, Input, Vec3, Color, input, EventTouch , EventMouse, RigidBody2D, v2, Collider2D, Contact2DType, IPhysics2DContact, find, Sprite, CCInteger, Prefab} from 'cc';
 import { AudioEngine } from './AudioEngine';
 import { ScoreDisplay } from './ScoreDisplay';
 import { WebManager } from './WebManager';
 import { GameStartCounter } from './GameStartCounter';
+import { BirdControl } from './BirdControl';
 
 const { ccclass, property } = _decorator;
 
@@ -15,13 +16,17 @@ export class GameManager extends Component {
     public static countdownOver: boolean = false;
     private _webManager: WebManager = null;
     private myBird: Node = null;
-    private otherBirds: Node[] = [];
+    private otherBirds: {[key: string]: Node} = {};
+
+    @property(Prefab)
+    birdPrefab: Prefab = null;
 
     start() {
         // 注册交互事件，只有注册了之后触发才起作用
         input.on(Input.EventType.TOUCH_START, this.onTouchStart, this);
         input.on(Input.EventType.MOUSE_DOWN, this.onMouseDown, this);
         this._webManager = find("Canvas/WebManager").getComponent(WebManager);
+        this.myBird = find("Canvas/Bird");
     }
 
     onTouchStart(event: EventTouch) {
@@ -31,31 +36,49 @@ export class GameManager extends Component {
         // 游戏开始倒计时
         find("Canvas/GameStartCountdown").getComponent(GameStartCounter).startCountdown(()=>{
             this.startGame();
-            this.jump();
+            this.myBird.getComponent(BirdControl).jump();
         });
         if (!GameManager.countdownOver) {
             return;
         }
         
         // this.startGame();
-        this.jump();
+        this.myBird.getComponent(BirdControl).jump();
+        this._webManager.sendWebSocketData("jump");
     }
 
     onKeyDown(event: KeyboardEvent) {
     }
 
     onMouseDown(event: EventMouse){
-        if (GameManager.gameLost || !GameManager.countdownOver) {
-            return;
-        }
-        this.startGame();
-        this.jump();
-        console.log("sss");
-        this._webManager.sendWebSocketData("jump");
+        this.onTouchStart(null);
+        // if (GameManager.gameLost || !GameManager.countdownOver) {
+        //     return;
+        // }
+        // this.startGame();
+        // this.myBird.getComponent(BirdControl).jump();
+        // this._webManager.sendWebSocketData("jump");
     }
 
     update(deltaTime: number) {
         
+    }
+
+    initMyBird(uuid: string) {
+        this.myBird = instantiate(this.birdPrefab);
+        console.log("构造我的小鸟成功");
+        find("Canvas").addChild(this.myBird);
+        this.myBird.getComponent(BirdControl)._uuid = uuid;
+    }
+
+    initOtherBird(uuid: string) {
+        let otherBird = instantiate(this.birdPrefab);
+        console.log("构造其他小鸟成功");
+        console.log(`其它小鸟的名字 ${otherBird.name}`);
+        find("Canvas").addChild(otherBird);
+        otherBird.getComponent(BirdControl)._uuid = uuid;
+        // 其它玩家的小鸟是黄色
+        this.otherBirds[uuid] = otherBird;
     }
 
     startGame() {
@@ -68,7 +91,11 @@ export class GameManager extends Component {
         }
 
         GameManager.gameStarted = true;
-        this.getComponent(Animation).play();
+        // 所有小鸟都开始播放飞翔动画
+        this.myBird.getComponent(Animation).play();
+        for (let key in this.otherBirds) {
+            this.otherBirds[key].getComponent(Animation).play();
+        }
         let title = find("Canvas/Title");
         let gameOverLabel = find("Canvas/GameOver");
         find("Canvas/Score").getComponent(ScoreDisplay).refreshScoreDisplay();
@@ -85,7 +112,10 @@ export class GameManager extends Component {
 
         this.node.setPosition(new Vec3(0,0,0));
         // 手动设置位置之后需要重新唤醒刚体，否则在触发碰撞等物理事件之前刚体属性不起作用
-        this.getComponent(RigidBody2D).wakeUp();
+        this.myBird.getComponent(RigidBody2D).wakeUp();
+        for (let key in this.otherBirds) {
+            this.otherBirds[key].getComponent(RigidBody2D).wakeUp();
+        }
     }
 
     gameOver() {
