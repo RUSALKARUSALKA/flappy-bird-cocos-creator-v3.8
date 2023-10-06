@@ -7,5 +7,17 @@
       "fitHeight": false
     }
   },
-  "custom_joint_texture_layouts": []
+  "custom_joint_texture_layouts": [],
+  "physics": {
+    "collisionGroups": [
+      {
+        "index": 1,
+        "name": "bird"
+      }
+    ],
+    "collisionMatrix": {
+      "0": 3,
+      "1": 1
+    }
+  }
 }

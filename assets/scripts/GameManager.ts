@@ -37,6 +37,7 @@ export class GameManager extends Component {
         find("Canvas/GameStartCountdown").getComponent(GameStartCounter).startCountdown(()=>{
             this.startGame();
             this.myBird.getComponent(BirdControl).jump();
+            this._webManager.sendWebSocketData("jump");
         });
         if (!GameManager.countdownOver) {
             return;
@@ -75,10 +76,21 @@ export class GameManager extends Component {
         let otherBird = instantiate(this.birdPrefab);
         console.log("构造其他小鸟成功");
         console.log(`其它小鸟的名字 ${otherBird.name}`);
+        otherBird.name = "Bird" + uuid;
         find("Canvas").addChild(otherBird);
         otherBird.getComponent(BirdControl)._uuid = uuid;
-        // 其它玩家的小鸟是黄色
+        // 其它玩家的小鸟是半透明的
+        otherBird.getComponent(Sprite).color = new Color(255, 255, 255, 122);
         this.otherBirds[uuid] = otherBird;
+    }
+
+    removeOtherBird(uuid: string) {
+        find("Canvas").removeChild(this.otherBirds[uuid]);
+        delete this.otherBirds[uuid];
+    }
+
+    letBirdJump(uuid: string) {
+        this.otherBirds[uuid].getComponent(BirdControl).jump();
     }
 
     startGame() {

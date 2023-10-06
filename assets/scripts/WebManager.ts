@@ -37,13 +37,13 @@ export class WebManager extends Component {
                 // 登录成功，创建一个小鸟
                 // 在Canvas中添加一个小鸟node
                 find("Canvas/GameManager").getComponent(GameManager).initMyBird(webUuid);
-                console.log("创建我的小鸟成功");
+                console.log(`创建我的小鸟成功 ${webUuid}`);
             }
             else if (event.data.toString().indexOf("jump") != -1) {
-                console.log("收到跳跃指令");
-                console.log(find("Canvas/Ground"));
-                find("Canvas/Bird").getComponent(BirdControl).jump();
-                // this.node.emit("jump");
+                const webUuid = event.data.toString().split(" ").pop();
+                console.log(`收到玩家 ${webUuid} 的跳跃指令`);
+                find("Canvas/GameManager").getComponent(GameManager).letBirdJump(webUuid);
+                // find("Canvas/Bird").getComponent(BirdControl).jump();
             }
             else if (event.data.toString().indexOf("query_current_players") != -1) {
                 console.log("查询当前玩家");
@@ -61,6 +61,11 @@ export class WebManager extends Component {
                 const newPlayer = event.data.toString().split(" ").pop();
                 console.log("newPlayer:", newPlayer);
                 find("Canvas/GameManager").getComponent(GameManager).initOtherBird(newPlayer);
+            }
+            else if (event.data.toString().indexOf("leave") != -1) {
+                const leftPlayer = event.data.toString().split(" ").pop();
+                console.log(`玩家离开了 ${leftPlayer}`);
+                find("Canvas/GameManager").getComponent(GameManager).removeOtherBird(leftPlayer);
             }
         };
 
