@@ -16,7 +16,8 @@ export class GameStartCounter extends Component {
         
     }
 
-    startCountdown(f) {
+    // 异步倒计时
+    startCountdown() {
         if (GameManager.countdownStart || GameManager.gameStarted) {
             return;
         }
@@ -30,13 +31,12 @@ export class GameStartCounter extends Component {
                         find("Canvas/GameStartCountdown").getComponent(Sprite).spriteFrame = null;
                         GameManager.countdownOver = true;
                         GameManager.countdownStart = false;
-                        f();
                     }
                     r(888);
                 }, 1000);
             }
         );
-        t(2).then((r) => t(1)).then((r) => t(0)).catch((e) => console.log(e));
+        return t(2).then((r) => t(1)).then((r) => t(0)).catch((e) => console.log(e));
     }
 }
 

@@ -43,7 +43,6 @@ export class WebManager extends Component {
                 const webUuid = event.data.toString().split(" ").pop();
                 console.log(`收到玩家 ${webUuid} 的跳跃指令`);
                 find("Canvas/GameManager").getComponent(GameManager).letBirdJump(webUuid);
-                // find("Canvas/Bird").getComponent(BirdControl).jump();
             }
             else if (event.data.toString().indexOf("query_current_players") != -1) {
                 console.log("查询当前玩家");
@@ -66,6 +65,14 @@ export class WebManager extends Component {
                 const leftPlayer = event.data.toString().split(" ").pop();
                 console.log(`玩家离开了 ${leftPlayer}`);
                 find("Canvas/GameManager").getComponent(GameManager).removeOtherBird(leftPlayer);
+            }
+            else if (event.data.toString().indexOf("host") != -1) {
+                console.log("你是房主，好屌哦~单击开始游戏！");
+                find("Canvas/GameManager").getComponent(GameManager).isHost = true;
+            }
+            else if (event.data.toString().indexOf("start") != -1) {
+                console.log("房主发起了游戏开始的指令！做好准备！");
+                find("Canvas/GameManager").getComponent(GameManager).startGame();
             }
         };
 

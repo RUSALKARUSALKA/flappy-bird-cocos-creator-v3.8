@@ -17,6 +17,7 @@ export class GameManager extends Component {
     private _webManager: WebManager = null;
     private myBird: Node = null;
     private otherBirds: {[key: string]: Node} = {};
+    private _isHost: boolean = false;
 
     @property(Prefab)
     birdPrefab: Prefab = null;
@@ -34,16 +35,21 @@ export class GameManager extends Component {
             return;
         }
         // 游戏开始倒计时
-        find("Canvas/GameStartCountdown").getComponent(GameStartCounter).startCountdown(()=>{
+        // 只有房主可以发起开始
+        if (this._isHost && !GameManager.gameStarted) {
+            this._webManager.sendWebSocketData("start game!");
             this.startGame();
-            this.myBird.getComponent(BirdControl).jump();
-            this._webManager.sendWebSocketData("jump");
-        });
+            // find("Canvas/GameStartCountdown").getComponent(GameStartCounter).startCountdown(()=>{
+            //     this.startGame();
+            // });
+        }
         if (!GameManager.countdownOver) {
+            if (!this._isHost) {
+                console.log("你tm又不是房主，瞎点个jb 老老实实等房主开始");
+            }
             return;
         }
         
-        // this.startGame();
         this.myBird.getComponent(BirdControl).jump();
         this._webManager.sendWebSocketData("jump");
     }
@@ -74,9 +80,8 @@ export class GameManager extends Component {
 
     initOtherBird(uuid: string) {
         let otherBird = instantiate(this.birdPrefab);
-        console.log("构造其他小鸟成功");
-        console.log(`其它小鸟的名字 ${otherBird.name}`);
         otherBird.name = "Bird" + uuid;
+        console.log(`构造其他小鸟成功 其它小鸟的名字 ${otherBird.name}`);
         find("Canvas").addChild(otherBird);
         otherBird.getComponent(BirdControl)._uuid = uuid;
         // 其它玩家的小鸟是半透明的
@@ -93,11 +98,12 @@ export class GameManager extends Component {
         this.otherBirds[uuid].getComponent(BirdControl).jump();
     }
 
-    startGame() {
+    async startGame() {
         if (GameManager.gameStarted) {
             return;
         }
-        
+        // 等这个弔倒计时结束了再正式开始游戏
+        await find("Canvas/GameStartCountdown").getComponent(GameStartCounter).startCountdown();
         if (!GameManager.countdownOver) {
             return;
         }
@@ -153,6 +159,14 @@ export class GameManager extends Component {
             c = new Color(c.r, c.g, c.b, 255 * ratio);
             node.getComponent(Sprite).color = c;
         }}).start(); 
+    }
+
+    set isHost(v: boolean) {
+        this._isHost = v;
+    }
+
+    get isHost() {
+        return this._isHost;
     }
 
 }
