@@ -6,7 +6,8 @@ const { ccclass, property } = _decorator;
 @ccclass('WebManager')
 export class WebManager extends Component {
     private socket: WebSocket = null;
-    private serverURL: string = "ws://192.168.8.2:8000/";
+    // private serverURL: string = "ws://192.168.8.2:5001/";
+    private serverURL: string = "ws://120.24.205.202:5001/";
 
     start() {
         this.initWebSocketConnection();

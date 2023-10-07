@@ -207,7 +207,7 @@
     "__prefab": {
       "__id__": 8
     },
-    "tag": 0,
+    "tag": 4,
     "_group": 1,
     "_density": 1,
     "_sensor": false,
@@ -563,7 +563,7 @@
     "__prefab": {
       "__id__": 27
     },
-    "pipeMoveSpeed": 0,
+    "pipeMoveSpeed": -2,
     "_id": ""
   },
   {

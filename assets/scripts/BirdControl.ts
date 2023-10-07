@@ -42,6 +42,7 @@ export class BirdControl extends Component {
         switch (otherCollider.tag) {
             // case 0: // 忽略鸟和鸟的碰撞
             case 1:
+            case 4:
             case 3:
                 this.getComponent(AudioEngine).play("hit");
                 GameManager.score = 0;
